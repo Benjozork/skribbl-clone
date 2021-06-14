@@ -1,6 +1,11 @@
 {
   "name": "skribbl-clone",
   "version": "1.0.0",
+  "scripts": {
+    "start": "snowpack dev",
+    "lint": "eslint --cache **/*.{js,mjs,jsx,ts,tsx}",
+    "lint-fix": "npm run lint -- --fix"
+  },
   "dependencies": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
