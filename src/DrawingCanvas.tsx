@@ -1,10 +1,17 @@
-import React, { FC, MouseEvent, useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, FC, MouseEvent, useEffect, useRef, useState } from 'react';
 
 const BLOCK_SIZE = 7;
 const HALF_BLOCK_SIZE = BLOCK_SIZE / 2;
-const STEP_DEBUG = true;
+const STEP_DEBUG = false;
 
-export const DrawingCanvas: FC = () => {
+export type DrawingCanvasProps = {
+    width: number,
+    height: number,
+    className?: string,
+    style?: CSSProperties,
+}
+
+export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className, style }) => {
     const canvasRef = useRef<HTMLCanvasElement>();
 
     const [context, setContext] = useState<CanvasRenderingContext2D>();
@@ -83,9 +90,11 @@ export const DrawingCanvas: FC = () => {
 
     return (
         <canvas
+            className={className}
+            style={style}
             ref={canvasRef}
-            width={500}
-            height={500}
+            width={width}
+            height={height}
             onMouseMove={handleMouseMove}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
