@@ -40,6 +40,16 @@ export interface DenyGameLogin {
     _message: ServerMessages.DenyGameLogin,
 }
 
+export interface AddGamePlayer {
+    _message: ServerMessages.AddGamePlayer,
+    user: Record<string, unknown>;
+}
+
+export interface RemoveGamePlayer {
+    _message: ServerMessages.RemoveGamePlayer
+    userId: number,
+}
+
 export enum GuessChatMessageType {
     UNSUCCESSFUL,
     SUCCESSFUL,
@@ -58,4 +68,6 @@ export type Message =
       LoginToGame
     | ConfirmGameLogin
     | DenyGameLogin
+    | AddGamePlayer
+    | RemoveGamePlayer
     | GuessChatUpdate

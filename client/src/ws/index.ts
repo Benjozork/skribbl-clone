@@ -38,9 +38,9 @@ export class WebsocketClient {
 
         switch (_message) {
         case ServerMessages.ConfirmGameLogin:
-            console.log(incoming);
-            break;
         case ServerMessages.DenyGameLogin:
+        case ServerMessages.AddGamePlayer:
+        case ServerMessages.RemoveGamePlayer:
             console.log(incoming);
             break;
         default:
