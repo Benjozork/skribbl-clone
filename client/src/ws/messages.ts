@@ -29,6 +29,7 @@ export interface LoginToGame {
     _message: ClientMessages.LoginToGame,
     username: string,
     color: `#${string}`,
+    censorUserContent: boolean,
 }
 
 export interface ConfirmGameLogin {

@@ -26,6 +26,7 @@ Attempts to log in to a game.
 
 * `username`: `string`
 * `color`: `HexColor`
+* `censorUserContent`: `boolean` - Whether the server should censor user content sent to the client
 
 ### `S_ConfirmGameLogin`
 

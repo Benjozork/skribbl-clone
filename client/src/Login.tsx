@@ -16,6 +16,7 @@ export const Login: FC = () => {
             _message: ClientMessages.LoginToGame,
             username,
             color,
+            censorUserContent: false, // TODO add option in UI
         });
     };
 
