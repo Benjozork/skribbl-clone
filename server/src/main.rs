@@ -22,6 +22,7 @@ struct User {
     id: usize,
     username: String,
     color: String,
+    censor_user_content: Option<bool>,
 }
 
 type Users = Arc<RwLock<HashMap<usize, User>>>;
@@ -33,6 +34,7 @@ type ConnectedClients =
 struct LoginToGame {
     username: String,
     color: String,
+    censor_user_content: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -168,6 +170,7 @@ async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: 
         id: my_id,
         username: resp.username,
         color: resp.color,
+        censor_user_content: resp.censor_user_content,
     };
 
     for (_, j) in users.read().await.iter() {
@@ -182,11 +185,26 @@ async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: 
         return Err("User is different than stored user".to_string());
     }
 
+    let censorer = censor::Standard + censor::Sex;
+
     for (&uid, tx) in connected_clients.read().await.iter() {
         if user.id != uid {
+            let should_censor = users.read().await.get(&uid).unwrap().censor_user_content;
+
+            let mut user = user.clone();
+
+            let should_censor = match should_censor {
+                Some(val) => val,
+                None => false,
+            };
+
+            if should_censor {
+                user.username = censorer.censor(&user.username);
+            }
+
             let resp = AddGamePlayer {
                 _message: "S_AddGamePlayer".to_string(),
-                user: user.clone(),
+                user,
             };
             let resp_text = serde_json::to_string(&resp).unwrap();
 
