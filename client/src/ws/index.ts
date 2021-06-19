@@ -9,13 +9,13 @@ export class WebsocketClient {
         this.websocket = new WebSocket(this.url);
 
         this.websocket.onerror = () => {
-            alert('Could not connect to server.');
+            console.log('Could not connect to server.');
         };
         this.websocket.onopen = () => {
-            alert('Connected to server.');
+            console.log('Connected to server.');
         };
         this.websocket.onmessage = (message) => {
-            alert(`Server says: ${message.data}`);
+            console.log(`Server says: ${message.data}`);
         };
     }
 
