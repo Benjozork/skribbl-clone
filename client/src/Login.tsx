@@ -38,7 +38,7 @@ export const Login: FC = () => {
             <div className="py-4">
                 <div className="py-1">
                     <input
-                        className="focus:outline-none shadow-xl text-xl py-2 pl-1 w-96 placeholder-opacity-60"
+                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-96 placeholder-opacity-60"
                         placeholder="Name"
                         ref={usernameInputRef}
                         type="text"
@@ -47,7 +47,7 @@ export const Login: FC = () => {
                 </div>
                 <div className="py-1">
                     <input
-                        className="focus:outline-none shadow-xl text-xl py-2 pl-1 w-96 placeholder-opacity-60"
+                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-96 placeholder-opacity-60"
                         placeholder="Color"
                         ref={colorInputRef}
                         type="text"
