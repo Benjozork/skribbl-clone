@@ -17,6 +17,7 @@
   "rules": {
     "one-var": "off",
     "import/no-unresolved": "off",
+    "no-empty-function": "off",
     "no-useless-constructor": "off"
   }
 }

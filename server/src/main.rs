@@ -67,6 +67,11 @@ async fn user_connected(ws: WebSocket, users: ConnectedUsers) {
             }
         };
 
+        let users = users.read().unwrap();
+        let me = users.get(&my_id).unwrap();
+
+        me.send(Ok(Message::text(msg.to_str().unwrap())));
+
         eprintln!("Received {} from ws", msg.to_str().unwrap());
     }
 

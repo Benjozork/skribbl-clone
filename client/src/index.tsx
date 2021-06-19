@@ -1,12 +1,19 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { DrawingCanvas, DrawingCanvasController, DrawingCanvasControllerUsage } from './GameBaord/DrawingCanvas';
 import { ToolBox } from './GameBaord/ToolBox';
+import { WebsocketClient } from './ws';
 
 import './styles.css';
 
 const App: FC = () => {
+    const [client] = useState(() => new WebsocketClient('ws://localhost:3030/test'));
+
     const [drawingCanvasController, setDrawingCanvasController] = useState<DrawingCanvasController>();
+
+    useEffect(() => {
+        console.log('bruh 1');
+    }, [client]);
 
     const handleUseController = (func: DrawingCanvasControllerUsage) => {
         drawingCanvasController?.use(func);
