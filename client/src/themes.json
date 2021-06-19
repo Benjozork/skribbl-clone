@@ -52,5 +52,11 @@
         "accent": "#00C2CB",
         "standard": "#1B2434",
         "body": "#171E2B"
+    },
+    {
+        "title": "Duke",
+        "accent": "#FB4948",
+        "standard": "#10110F",
+        "body": "#FDFEF4"
     }
 ]
