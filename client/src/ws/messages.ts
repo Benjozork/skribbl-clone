@@ -31,6 +31,14 @@ export interface LoginToGame {
     color: `#${string}`,
 }
 
+export interface ConfirmGameLogin {
+    _message: ServerMessages.ConfirmGameLogin,
+}
+
+export interface DenyGameLogin {
+    _message: ServerMessages.DenyGameLogin,
+}
+
 export enum GuessChatMessageType {
     UNSUCCESSFUL,
     SUCCESSFUL,
@@ -45,4 +53,8 @@ export interface GuessChatUpdate {
     color: number,
 }
 
-export type Message = LoginToGame | GuessChatUpdate
+export type Message =
+      LoginToGame
+    | ConfirmGameLogin
+    | DenyGameLogin
+    | GuessChatUpdate

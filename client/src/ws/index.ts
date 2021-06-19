@@ -1,4 +1,4 @@
-import { Message } from './messages';
+import { Message, ServerMessages } from './messages';
 
 export class WebsocketClient {
     private websocket: WebSocket;
@@ -11,12 +11,20 @@ export class WebsocketClient {
         this.websocket.onerror = () => {
             console.log('Could not connect to server.');
         };
+
         this.websocket.onopen = () => {
             console.log('Connected to server.');
         };
+
         this.websocket.onmessage = (message) => {
             console.log(`Server says: ${message.data}`);
         };
+          
+        this.websocket.addEventListener('message', (event) => {
+            const message = JSON.parse((event.data as string));
+
+            this.receiveMessage(message);
+        });
     }
 
     sendMessage(msg: Message) {
@@ -26,6 +34,21 @@ export class WebsocketClient {
             });
         } else {
             this.websocket.send(JSON.stringify(msg));
+        }
+    }
+
+    receiveMessage(incoming: Message) {
+        const { _message } = incoming;
+
+        switch (_message) {
+        case ServerMessages.ConfirmGameLogin:
+            console.log(incoming);
+            break;
+        case ServerMessages.DenyGameLogin:
+            console.log(incoming);
+            break;
+        default:
+            console.error(`Invalid message type: ${_message}`);
         }
     }
 }
