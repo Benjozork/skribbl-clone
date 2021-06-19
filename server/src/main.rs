@@ -107,28 +107,26 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
                 let resp: Result<LoginToGame, serde_json::Error> =
                     serde_json::from_str(msg.to_str().unwrap());
                 match resp {
-                    Ok(resp) => {
-                        match user_connect(users.clone(), my_id, resp).await {
-                            Ok(user) => {
-                                let resp = LoginSucceeded {
-                                    _message: "S_ConfirmGameLogin".to_string(),
-                                    user
-                                };
-                                let resp_text = serde_json::to_string(&resp).unwrap();
-                                me.send(Ok(Message::text(&resp_text))).unwrap();
-                            }
-
-                            // Return a failed connect call
-                            Err(err) => {
-                                let resp = LoginRejected {
-                                    _message: "S_DenyGameLogin".to_string(),
-                                    reason: format!("{:?}", err),
-                                };
-                                let resp_text = serde_json::to_string(&resp).unwrap();
-                                me.send(Ok(Message::text(&resp_text))).unwrap();
-                            }
+                    Ok(resp) => match user_connect(users.clone(), my_id, resp).await {
+                        Ok(user) => {
+                            let resp = LoginSucceeded {
+                                _message: "S_ConfirmGameLogin".to_string(),
+                                user
+                            };
+                            let resp_text = serde_json::to_string(&resp).unwrap();
+                            me.send(Ok(Message::text(&resp_text))).unwrap();
                         }
-                    }
+
+                        // Return a failed connect call
+                        Err(err) => {
+                            let resp = LoginRejected {
+                                _message: "S_DenyGameLogin".to_string(),
+                                reason: format!("{:?}", err),
+                            };
+                            let resp_text = serde_json::to_string(&resp).unwrap();
+                            me.send(Ok(Message::text(&resp_text))).unwrap();
+                        }
+                    },
 
                     // Return a failed connect call
                     Err(err) => {
@@ -144,24 +142,33 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
             _ => (),
         }
 
-        eprintln!("{:?}", resp);
+        eprintln!("call: {:?}", resp);
     }
 
-    client_disconnected(my_id, &connected_clients).await;
+    client_disconnected(my_id, &connected_clients, users).await;
 }
 
-async fn client_disconnected(my_id: usize, users: &ConnectedClients) {
+async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients, users: Users) {
     eprintln!("User {} disconnected", my_id);
 
+    connected_clients.write().await.remove(&my_id);
     users.write().await.remove(&my_id);
 }
 
 async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<User, String> {
+    //TODO: Filter Inappropriate usernames
+
     let user = User {
         id: my_id,
         username: resp.username,
         color: resp.color,
     };
+
+    for (_, j) in users.read().await.iter() {
+        if j.username == user.username && j.id != user.id {
+            return Err("User already exists".to_string())
+        }
+    }
 
     if users.read().await.get(&my_id).is_none() {
         users.write().await.insert(
@@ -172,7 +179,9 @@ async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<U
         return Err("User is different than stored user".to_string())
     }
 
-    eprintln!("{:?}", users.read().await.get(&my_id).unwrap());
+    for (key, value) in users.read().await.iter() {
+        eprintln!("key: {}\nvalue: {:?}\n", key, value)
+    }
 
     Ok(user)
 }
