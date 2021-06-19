@@ -26,8 +26,6 @@ export const themeColors: themeColorProps = {
     ACCENT: JSON.parse(localStorage.getItem('theme')).accent,
 };
 
-console.log(themeColors);
-
 const App: FC = () => (
     <Provider store={store}>
         <ClientContextProvider>

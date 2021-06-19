@@ -28,10 +28,8 @@ export const Login: FC = () => {
         if (colorInputRef.current) {
             if (!colorInputRef.current.value.includes('#')) {
                 setColor(`#${colorInputRef.current.value}`);
-                console.log(colorInputRef.current.value);
             } else {
                 setColor(colorInputRef.current.value);
-                console.log(colorInputRef.current.value);
             }
         }
     };
