@@ -1,4 +1,4 @@
-use tokio::sync::mpsc;
+use tokio::sync::{RwLock, mpsc};
 
 use tokio_stream::wrappers::UnboundedReceiverStream;
 
@@ -9,12 +9,12 @@ use warp::{
     ws::{WebSocket, Message}
 };
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use serde_json::Value;
 
 use std::{
-    sync::{RwLock, Arc},
+    sync::Arc,
     collections::HashMap,
     sync::atomic::AtomicUsize,
     sync::atomic::Ordering
@@ -32,6 +32,17 @@ struct LoginToGame {
     color: String,
 }
 
+#[derive(Serialize)]
+struct LoginSucceeded {
+    _message: String,
+}
+
+#[derive(Serialize)]
+struct LoginRejected {
+    _message: String,
+    reason: String,
+}
+
 #[tokio::main]
 async fn main() {
     env_logger::init();
@@ -47,8 +58,8 @@ async fn main() {
         .and(warp::ws())
         .and(connected_clients)
         .and(users)
-        .map(|ws: warp::ws::Ws, connect_clients, users| {
-            ws.on_upgrade(move |socket| client_connected(socket, connect_clients, users))
+        .map(|ws: warp::ws::Ws, connected_clients, users| {
+            ws.on_upgrade(move |socket| client_connected(socket, connected_clients, users))
         });
 
     warp::serve(websocket)
@@ -72,7 +83,7 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
         }
     }));
 
-    connected_clients.write().unwrap().insert(my_id, tx);
+    connected_clients.write().await.insert(my_id, tx);
 
     while let Some(result) = user_ws_rx.next().await {
         let msg = match result {
@@ -83,8 +94,8 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
             }
         };
 
-        let users = connected_clients.read().unwrap();
-        let me = users.get(&my_id).unwrap();
+        let connected_clients = connected_clients.read().await;
+        let me = connected_clients.get(&my_id).unwrap();
 
         eprintln!("Received {} from ws", msg.to_str().unwrap());
 
@@ -94,10 +105,35 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
             Some("C_LoginToGame") => {
                 let resp: Result<LoginToGame, serde_json::Error> = serde_json::from_str(msg.to_str().unwrap());
                 match resp {
-                    Ok(resp) => eprintln!("username: {}\ncolor: {}", resp.username, resp.color),
+                    Ok(resp) => {
+                        match user_connect(users.clone(), my_id, resp).await {
+                            Ok(_) => {
+                                let resp = LoginSucceeded { _message: "S_ConfirmGameLogin".to_string() };
+                                let resp_text = serde_json::to_string(&resp).unwrap();
+                                me.send(Ok(Message::text(&resp_text)));
+                            },
+
+                            // Return a failed connect call.
+                            Err(err) => {
+                                let resp = LoginRejected {
+                                    _message: "S_DenyGameLogin".to_string(),
+                                    reason: format!("{:?}", err),
+                                };
+                                let resp_text = serde_json::to_string(&resp).unwrap();
+                                me.send(Ok(Message::text(&resp_text)));
+                            },
+                        }
+                    },
 
                     // Return a failed connect call.
-                    Err(err) => eprintln!("Failed to convert call to struct. Err: {:?}", err),
+                    Err(err) => {
+                        let resp = LoginRejected {
+                            _message: "S_DenyGameLogin".to_string(),
+                            reason: format!("{:?}", err),
+                        };
+                        let resp_text = serde_json::to_string(&resp).unwrap();
+                        me.send(Ok(Message::text(&resp_text)));
+                    },
                 }
             },
             _ => (),
@@ -112,11 +148,13 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
 async fn client_disconnected(my_id: usize, users: &ConnectedClients) {
     eprintln!("User {} disconnected", my_id);
 
-    users.write().unwrap().remove(&my_id);
+    users.write().await.remove(&my_id);
 }
 
-async fn user_connect(users: Users, my_id: usize, name: String) {
-    users.write().unwrap().insert(my_id, name);
+async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<(), String>{
+    users.write().await.insert(my_id, resp.username);
 
-    eprintln!("{:?}", users.read().unwrap());
+    eprintln!("{}", users.read().await.get(&my_id).unwrap());
+
+    Ok(())
 }
