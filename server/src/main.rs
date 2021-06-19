@@ -60,7 +60,7 @@ struct AddGamePlayer {
 #[derive(Serialize)]
 struct RemoveGamePlayer {
     _message: String,
-    user: User,
+    id: usize,
 }
 
 #[tokio::main]
@@ -178,24 +178,10 @@ async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients,
     connected_clients.write().await.remove(&my_id);
     users.write().await.remove(&my_id);
 
-    let censorer = censor::Standard + censor::Sex;
-
-    for (&uid, tx) in connected_clients.read().await.iter() {
-        let user_read = users.read().await;
-
-        let user = user_read.get(&uid).unwrap();
-
-        let should_censor = user.censor_user_content;
-
-        let mut user = user.clone();
-
-        if should_censor {
-            user.username = censorer.censor(&user.username);
-        }
-
+    for (_, tx) in connected_clients.read().await.iter() {
         let resp = RemoveGamePlayer {
             _message: "S_RemoveGamePlayer".to_string(),
-            user,
+            id: my_id,
         };
         let resp_text = serde_json::to_string(&resp).unwrap();
 
