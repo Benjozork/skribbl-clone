@@ -16,7 +16,6 @@
     "@flybywiresim/eslint-config": "^0.1.0",
     "@snowpack/plugin-postcss": "^1.4.1",
     "@snowpack/plugin-react-refresh": "^2.5.0",
-    "@snowpack/plugin-sass": "^1.4.0",
     "@types/react": "^17.0.11",
     "@types/react-dom": "^17.0.7",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
