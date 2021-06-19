@@ -1,30 +1,33 @@
-use tokio::sync::{RwLock, mpsc};
+use tokio::sync::{mpsc, RwLock};
 
 use tokio_stream::wrappers::UnboundedReceiverStream;
 
 use futures::{FutureExt, StreamExt};
 
 use warp::{
+    ws::{Message, WebSocket},
     Filter,
-    ws::{WebSocket, Message}
 };
 
 use serde::{Deserialize, Serialize};
 
 use serde_json::Value;
 
-use std::{
-    sync::Arc,
-    collections::HashMap,
-    sync::atomic::AtomicUsize,
-    sync::atomic::Ordering
-};
+use std::{collections::HashMap, sync::atomic::AtomicUsize, sync::atomic::Ordering, sync::Arc};
 
 static NEXT_USER_ID: AtomicUsize = AtomicUsize::new(1);
 
-type Users = Arc<RwLock<HashMap<usize, String>>>;
+#[derive(Debug)]
+struct User {
+    id: usize,
+    username: String,
+    color: String,
+}
 
-type ConnectedClients = Arc<RwLock<HashMap<usize, mpsc::UnboundedSender<Result<Message, warp::Error>>>>>;
+type Users = Arc<RwLock<HashMap<usize, User>>>;
+
+type ConnectedClients =
+    Arc<RwLock<HashMap<usize, mpsc::UnboundedSender<Result<Message, warp::Error>>>>>;
 
 #[derive(Deserialize)]
 struct LoginToGame {
@@ -50,9 +53,8 @@ async fn main() {
     let connected_clients = ConnectedClients::default();
     let connected_clients = warp::any().map(move || connected_clients.clone());
 
-    let users: Users = Arc::from(RwLock::from(HashMap::new()));
+    let users: Users = Users::default();
     let users = warp::any().map(move || users.clone());
-
 
     let websocket = warp::path("test")
         .and(warp::ws())
@@ -62,9 +64,7 @@ async fn main() {
             ws.on_upgrade(move |socket| client_connected(socket, connected_clients, users))
         });
 
-    warp::serve(websocket)
-        .run(([127, 0, 0, 1], 3030))
-        .await;
+    warp::serve(websocket).run(([127, 0, 0, 1], 3030)).await;
 }
 
 async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, users: Users) {
@@ -103,39 +103,42 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
 
         match resp["_message"].as_str() {
             Some("C_LoginToGame") => {
-                let resp: Result<LoginToGame, serde_json::Error> = serde_json::from_str(msg.to_str().unwrap());
+                let resp: Result<LoginToGame, serde_json::Error> =
+                    serde_json::from_str(msg.to_str().unwrap());
                 match resp {
                     Ok(resp) => {
                         match user_connect(users.clone(), my_id, resp).await {
                             Ok(_) => {
-                                let resp = LoginSucceeded { _message: "S_ConfirmGameLogin".to_string() };
+                                let resp = LoginSucceeded {
+                                    _message: "S_ConfirmGameLogin".to_string(),
+                                };
                                 let resp_text = serde_json::to_string(&resp).unwrap();
-                                me.send(Ok(Message::text(&resp_text)));
-                            },
+                                me.send(Ok(Message::text(&resp_text))).unwrap();
+                            }
 
-                            // Return a failed connect call.
+                            // Return a failed connect call
                             Err(err) => {
                                 let resp = LoginRejected {
                                     _message: "S_DenyGameLogin".to_string(),
                                     reason: format!("{:?}", err),
                                 };
                                 let resp_text = serde_json::to_string(&resp).unwrap();
-                                me.send(Ok(Message::text(&resp_text)));
-                            },
+                                me.send(Ok(Message::text(&resp_text))).unwrap();
+                            }
                         }
-                    },
+                    }
 
-                    // Return a failed connect call.
+                    // Return a failed connect call
                     Err(err) => {
                         let resp = LoginRejected {
                             _message: "S_DenyGameLogin".to_string(),
                             reason: format!("{:?}", err),
                         };
                         let resp_text = serde_json::to_string(&resp).unwrap();
-                        me.send(Ok(Message::text(&resp_text)));
-                    },
+                        me.send(Ok(Message::text(&resp_text))).unwrap();
+                    }
                 }
-            },
+            }
             _ => (),
         }
 
@@ -151,10 +154,19 @@ async fn client_disconnected(my_id: usize, users: &ConnectedClients) {
     users.write().await.remove(&my_id);
 }
 
-async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<(), String>{
-    users.write().await.insert(my_id, resp.username);
+async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<(), String> {
+    if users.read().await.get(&my_id).is_none() {
+        users.write().await.insert(
+            my_id,
+            User {
+                id: my_id,
+                username: resp.username,
+                color: resp.color,
+            },
+        );
+    }
 
-    eprintln!("{}", users.read().await.get(&my_id).unwrap());
+    eprintln!("{:?}", users.read().await.get(&my_id).unwrap());
 
     Ok(())
 }
