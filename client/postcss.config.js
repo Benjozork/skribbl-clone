@@ -1,1 +1,1 @@
-module.exports = { plugins: { tailwindcss: {} }, use: { sass: {} } };
+module.exports = { plugins: { tailwindcss: {} } };
