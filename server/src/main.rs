@@ -22,7 +22,7 @@ struct User {
     id: usize,
     username: String,
     color: String,
-    censor_user_content: Option<bool>,
+    censor_user_content: bool,
 }
 
 type Users = Arc<RwLock<HashMap<usize, User>>>;
@@ -31,10 +31,11 @@ type ConnectedClients =
     Arc<RwLock<HashMap<usize, mpsc::UnboundedSender<Result<Message, warp::Error>>>>>;
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct LoginToGame {
     username: String,
     color: String,
-    censor_user_content: Option<bool>,
+    censor_user_content: bool,
 }
 
 #[derive(Serialize)]
@@ -51,6 +52,12 @@ struct LoginRejected {
 
 #[derive(Serialize)]
 struct AddGamePlayer {
+    _message: String,
+    user: User,
+}
+
+#[derive(Serialize)]
+struct RemoveGamePlayer {
     _message: String,
     user: User,
 }
@@ -103,38 +110,38 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
             }
         };
 
-        eprintln!("Received {} from ws", msg.to_str().unwrap());
+        handle_calls(connected_clients.clone(), users.clone(), msg, my_id).await;
+    }
 
-        let resp: Value = serde_json::from_str(msg.to_str().unwrap()).unwrap();
+    client_disconnected(my_id, &connected_clients, users).await;
+}
 
-        let connected_client_temp = connected_clients.read().await;
-        let me = connected_client_temp.get(&my_id).unwrap();
+async fn handle_calls(connected_clients: ConnectedClients, users: Users, msg: Message, my_id: usize) {
+    let msg = if let Ok(s) = msg.to_str() {
+        s
+    } else {
+        return;
+    };
 
-        match resp["_message"].as_str() {
-            Some("C_LoginToGame") => {
-                let resp: Result<LoginToGame, serde_json::Error> =
-                    serde_json::from_str(msg.to_str().unwrap());
-                match resp {
-                    Ok(resp) => match user_connect(connected_clients.clone(), users.clone(), my_id, resp).await {
-                        Ok(user) => {
-                            let resp = LoginSucceeded {
-                                _message: "S_ConfirmGameLogin".to_string(),
-                                user,
-                            };
-                            let resp_text = serde_json::to_string(&resp).unwrap();
-                            me.send(Ok(Message::text(&resp_text))).unwrap();
-                        }
+    let resp: Value = serde_json::from_str(msg).unwrap();
 
-                        // Return a failed connect call
-                        Err(err) => {
-                            let resp = LoginRejected {
-                                _message: "S_DenyGameLogin".to_string(),
-                                reason: format!("{:?}", err),
-                            };
-                            let resp_text = serde_json::to_string(&resp).unwrap();
-                            me.send(Ok(Message::text(&resp_text))).unwrap();
-                        }
-                    },
+    let connected_client_temp = connected_clients.read().await;
+    let me = connected_client_temp.get(&my_id).unwrap();
+
+    match resp["_message"].as_str() {
+        Some("C_LoginToGame") => {
+            let resp: Result<LoginToGame, serde_json::Error> =
+                serde_json::from_str(msg);
+            match resp {
+                Ok(resp) => match user_connect(connected_clients.clone(), users.clone(), my_id, resp).await {
+                    Ok(user) => {
+                        let resp = LoginSucceeded {
+                            _message: "S_ConfirmGameLogin".to_string(),
+                            user,
+                        };
+                        let resp_text = serde_json::to_string(&resp).unwrap();
+                        me.send(Ok(Message::text(&resp_text))).unwrap();
+                    }
 
                     // Return a failed connect call
                     Err(err) => {
@@ -145,15 +152,23 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
                         let resp_text = serde_json::to_string(&resp).unwrap();
                         me.send(Ok(Message::text(&resp_text))).unwrap();
                     }
+                },
+
+                // Return a failed connect call
+                Err(err) => {
+                    let resp = LoginRejected {
+                        _message: "S_DenyGameLogin".to_string(),
+                        reason: format!("{:?}", err),
+                    };
+                    let resp_text = serde_json::to_string(&resp).unwrap();
+                    me.send(Ok(Message::text(&resp_text))).unwrap();
                 }
             }
-            _ => (),
         }
-
-        eprintln!("call: {:?}", resp);
+        _ => (),
     }
 
-    client_disconnected(my_id, &connected_clients, users).await;
+    eprintln!("call: {:?}", resp);
 }
 
 async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients, users: Users) {
@@ -161,6 +176,30 @@ async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients,
 
     connected_clients.write().await.remove(&my_id);
     users.write().await.remove(&my_id);
+
+    let censorer = censor::Standard + censor::Sex;
+
+    for (&uid, tx) in connected_clients.read().await.iter() {
+        let user_read = users.read().await;
+
+        let user = user_read.get(&uid).unwrap();
+
+        let should_censor = user.censor_user_content;
+
+        let mut user = user.clone();
+
+        if should_censor {
+            user.username = censorer.censor(&user.username);
+        }
+
+        let resp = RemoveGamePlayer {
+            _message: "S_RemoveGamePlayer".to_string(),
+            user,
+        };
+        let resp_text = serde_json::to_string(&resp).unwrap();
+
+        tx.send(Ok(Message::text(&resp_text))).unwrap();
+    }
 }
 
 async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: usize, resp: LoginToGame) -> Result<User, String> {
@@ -192,11 +231,6 @@ async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: 
             let should_censor = users.read().await.get(&uid).unwrap().censor_user_content;
 
             let mut user = user.clone();
-
-            let should_censor = match should_censor {
-                Some(val) => val,
-                None => false,
-            };
 
             if should_censor {
                 user.username = censorer.censor(&user.username);
