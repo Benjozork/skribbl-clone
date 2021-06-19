@@ -17,7 +17,7 @@ use std::{collections::HashMap, sync::atomic::AtomicUsize, sync::atomic::Orderin
 
 static NEXT_USER_ID: AtomicUsize = AtomicUsize::new(1);
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Serialize)]
 struct User {
     id: usize,
     username: String,
@@ -38,6 +38,7 @@ struct LoginToGame {
 #[derive(Serialize)]
 struct LoginSucceeded {
     _message: String,
+    user: User
 }
 
 #[derive(Serialize)]
@@ -108,9 +109,10 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
                 match resp {
                     Ok(resp) => {
                         match user_connect(users.clone(), my_id, resp).await {
-                            Ok(_) => {
+                            Ok(user) => {
                                 let resp = LoginSucceeded {
                                     _message: "S_ConfirmGameLogin".to_string(),
+                                    user
                                 };
                                 let resp_text = serde_json::to_string(&resp).unwrap();
                                 me.send(Ok(Message::text(&resp_text))).unwrap();
@@ -154,19 +156,23 @@ async fn client_disconnected(my_id: usize, users: &ConnectedClients) {
     users.write().await.remove(&my_id);
 }
 
-async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<(), String> {
+async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<User, String> {
+    let user = User {
+        id: my_id,
+        username: resp.username,
+        color: resp.color,
+    };
+
     if users.read().await.get(&my_id).is_none() {
         users.write().await.insert(
             my_id,
-            User {
-                id: my_id,
-                username: resp.username,
-                color: resp.color,
-            },
+            user.clone(),
         );
+    } else if !(users.read().await.get(&my_id).unwrap() == &user) {
+        return Err("User is different than stored user".to_string())
     }
 
     eprintln!("{:?}", users.read().await.get(&my_id).unwrap());
 
-    Ok(())
+    Ok(user)
 }
