@@ -2,6 +2,20 @@
 
 Version 1.0
 
+## Data Types
+
+### `HexColor`
+
+`string` with format `/#\w+/`
+
+### `User`
+
+#### Fields
+
+* `username`: `string`
+* `color`: `HexColor`
+* `id`: `int`
+
 ## Commands
 
 ### `C_LoginToGame`
@@ -11,13 +25,13 @@ Attempts to log in to a game.
 #### Fields
 
 * `username`: `string`
-* `color`: `string` (format is HEX code with # prefix)
+* `color`: `HexColor`
 
 ### `S_ConfirmGameLogin`
 
 Confirms successful login attempt.
 
-*No fields*
+* `user`: `User`
 
 ### `S_DenyGameLogin`
 
@@ -35,9 +49,17 @@ Establishes initial game state.
 
 Notifies of a new player.
 
+#### Fields
+
+* `user`: `User`
+
 ### `S_RemoveGamePlayer`
 
 Notifies of a removed player.
+
+#### Fields
+
+* `id`: `number` - ID of the removed user
 
 ### `S_BeginDraw_Notify`
 
