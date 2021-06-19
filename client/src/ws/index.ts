@@ -1,3 +1,5 @@
+import { Message } from './messages';
+
 export class WebsocketClient {
     private websocket: WebSocket;
 
@@ -11,11 +13,19 @@ export class WebsocketClient {
         };
         this.websocket.onopen = () => {
             alert('Connected to server.');
-
-            this.websocket.send('text');
         };
         this.websocket.onmessage = (message) => {
-            alert(`Server says: ${message}`);
+            alert(`Server says: ${message.data}`);
         };
+    }
+
+    sendMessage(msg: Message) {
+        if (this.websocket.readyState === 0) {
+            this.websocket.addEventListener('open', () => {
+                this.websocket.send(JSON.stringify(msg));
+            });
+        } else {
+            this.websocket.send(JSON.stringify(msg));
+        }
     }
 }

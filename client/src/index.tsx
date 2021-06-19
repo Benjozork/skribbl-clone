@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { DrawingCanvas, DrawingCanvasController, DrawingCanvasControllerUsage } from './GameBaord/DrawingCanvas';
 import { ToolBox } from './GameBaord/ToolBox';
 import { WebsocketClient } from './ws';
+import { ClientMessages } from './ws/messages';
 
 import './styles.css';
 
@@ -12,7 +13,13 @@ const App: FC = () => {
     const [drawingCanvasController, setDrawingCanvasController] = useState<DrawingCanvasController>();
 
     useEffect(() => {
-        console.log('bruh 1');
+        if (client) {
+            client.sendMessage({
+                _message: ClientMessages.LoginToGame,
+                username: 'TestUser',
+                color: '#FF55FF',
+            });
+        }
     }, [client]);
 
     const handleUseController = (func: DrawingCanvasControllerUsage) => {
