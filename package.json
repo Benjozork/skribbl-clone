@@ -2,9 +2,10 @@
   "name": "skribbl-clone",
   "version": "1.0.0",
   "scripts": {
-    "start": "snowpack dev",
-    "lint": "eslint --cache **/*.{js,mjs,jsx,ts,tsx}",
-    "lint-fix": "npm run lint -- --fix"
+    "client:start": "cd client && snowpack dev",
+    "client:lint": "cd client && eslint --cache **/*.{js,mjs,jsx,ts,tsx}",
+    "client:lint-fix": "npm run client:lint -- --fix",
+    "server:start": "cd server && cargo run"
   },
   "dependencies": {
     "react": "^17.0.2",

@@ -9,9 +9,10 @@ export type DrawingCanvasProps = {
     height: number,
     className?: string,
     style?: CSSProperties,
+    onUpdatedDrawingCanvasController: (controller: DrawingCanvasController) => void,
 }
 
-export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className, style }) => {
+export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className, style, onUpdatedDrawingCanvasController }) => {
     const canvasRef = useRef<HTMLCanvasElement>();
 
     const [context, setContext] = useState<CanvasRenderingContext2D>();
@@ -26,6 +27,14 @@ export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className
         }
     }, [canvasRef]);
 
+    useEffect(() => {
+        if (context && canvasRef.current) {
+            onUpdatedDrawingCanvasController(new DrawingCanvasController(canvasRef.current, context));
+        } else {
+            onUpdatedDrawingCanvasController(null);
+        }
+    }, [context]);
+
     const handleMouseMove = ({ clientX, clientY }: MouseEvent<HTMLCanvasElement>) => {
         if (!mouseIsClicked) {
             return;
@@ -37,8 +46,8 @@ export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className
 
             if (lastDraw) {
                 const
-                    dx = x - lastDraw.x;
-                const dy = y - lastDraw.y;
+                    dx = x - lastDraw.x,
+                    dy = y - lastDraw.y;
 
                 if (Math.abs(dx) > HALF_BLOCK_SIZE || Math.abs(dy) > HALF_BLOCK_SIZE) {
                     const hy = Math.sqrt(Math.abs(dx) ** 2 + Math.abs(dy) ** 2);
@@ -102,3 +111,16 @@ export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className
         />
     );
 };
+
+export type DrawingCanvasControllerUsage = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => void;
+
+export class DrawingCanvasController {
+    constructor(
+        private canvas: HTMLCanvasElement,
+        private context: CanvasRenderingContext2D,
+    ) {}
+
+    use(func: DrawingCanvasControllerUsage) {
+        func(this.canvas, this.context);
+    }
+}

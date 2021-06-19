@@ -16,6 +16,7 @@
   ],
   "rules": {
     "one-var": "off",
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "no-useless-constructor": "off"
   }
 }
