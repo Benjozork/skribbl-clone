@@ -38,13 +38,19 @@ struct LoginToGame {
 #[derive(Serialize)]
 struct LoginSucceeded {
     _message: String,
-    user: User
+    user: User,
 }
 
 #[derive(Serialize)]
 struct LoginRejected {
     _message: String,
     reason: String,
+}
+
+#[derive(Serialize)]
+struct AddGamePlayer {
+    _message: String,
+    user: User,
 }
 
 #[tokio::main]
@@ -95,23 +101,23 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
             }
         };
 
-        let connected_clients = connected_clients.read().await;
-        let me = connected_clients.get(&my_id).unwrap();
-
         eprintln!("Received {} from ws", msg.to_str().unwrap());
 
         let resp: Value = serde_json::from_str(msg.to_str().unwrap()).unwrap();
+
+        let connected_client_temp = connected_clients.read().await;
+        let me = connected_client_temp.get(&my_id).unwrap();
 
         match resp["_message"].as_str() {
             Some("C_LoginToGame") => {
                 let resp: Result<LoginToGame, serde_json::Error> =
                     serde_json::from_str(msg.to_str().unwrap());
                 match resp {
-                    Ok(resp) => match user_connect(users.clone(), my_id, resp).await {
+                    Ok(resp) => match user_connect(connected_clients.clone(), users.clone(), my_id, resp).await {
                         Ok(user) => {
                             let resp = LoginSucceeded {
                                 _message: "S_ConfirmGameLogin".to_string(),
-                                user
+                                user,
                             };
                             let resp_text = serde_json::to_string(&resp).unwrap();
                             me.send(Ok(Message::text(&resp_text))).unwrap();
@@ -155,7 +161,7 @@ async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients,
     users.write().await.remove(&my_id);
 }
 
-async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<User, String> {
+async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: usize, resp: LoginToGame) -> Result<User, String> {
     //TODO: Filter Inappropriate usernames
 
     let user = User {
@@ -166,17 +172,26 @@ async fn user_connect(users: Users, my_id: usize, resp: LoginToGame) -> Result<U
 
     for (_, j) in users.read().await.iter() {
         if j.username == user.username && j.id != user.id {
-            return Err("User already exists".to_string())
+            return Err("User already exists".to_string());
         }
     }
 
     if users.read().await.get(&my_id).is_none() {
-        users.write().await.insert(
-            my_id,
-            user.clone(),
-        );
+        users.write().await.insert(my_id, user.clone());
     } else if !(users.read().await.get(&my_id).unwrap() == &user) {
-        return Err("User is different than stored user".to_string())
+        return Err("User is different than stored user".to_string());
+    }
+
+    for (&uid, tx) in connected_clients.read().await.iter() {
+        if user.id != uid {
+            let resp = AddGamePlayer {
+                _message: "S_AddGamePlayer".to_string(),
+                user: user.clone(),
+            };
+            let resp_text = serde_json::to_string(&resp).unwrap();
+
+            if let Err(_) = tx.send(Ok(Message::text(&resp_text))) {}
+        }
     }
 
     for (key, value) in users.read().await.iter() {
