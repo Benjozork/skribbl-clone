@@ -8,13 +8,24 @@ Version 1.0
 
 Attempts to log in to a game.
 
+#### Fields
+
+* `username`: `string`
+* `color`: `string` (format is HEX code with # prefix)
+
 ### `S_ConfirmGameLogin`
 
 Confirms successful login attempt.
 
+*No fields*
+
 ### `S_DenyGameLogin`
 
 Confirms unsuccessful login attempt.
+
+#### Fields
+
+* `reason?`: `string`
 
 ### `S_EstablishGameState`
 
