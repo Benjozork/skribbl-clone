@@ -18,6 +18,7 @@ use std::{collections::HashMap, sync::atomic::AtomicUsize, sync::atomic::Orderin
 static NEXT_USER_ID: AtomicUsize = AtomicUsize::new(1);
 
 #[derive(Debug, PartialEq, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct User {
     id: usize,
     username: String,
