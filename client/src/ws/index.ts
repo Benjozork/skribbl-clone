@@ -15,10 +15,6 @@ export class WebsocketClient {
         this.websocket.onopen = () => {
             console.log('Connected to server.');
         };
-
-        this.websocket.onmessage = (message) => {
-            console.log(`Server says: ${message.data}`);
-        };
           
         this.websocket.addEventListener('message', (event) => {
             const message = JSON.parse((event.data as string));
