@@ -55,7 +55,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
 
     const ColorSelection = ({ hexColor }: colorSelectionProps) => (
         <div
-            className={`${hexColor === selectedColor ? 'border-current/40' : 'border-transparent'} border-2 w-6 h-6 rounded-full cursor-pointer`}
+            className={`${hexColor === selectedColor ? 'border-current border-opacity-40' : 'border-transparent'} border-2 w-6 h-6 rounded-full cursor-pointer`}
             style={{ background: hexColor, color: themeColors.ACCENT }}
             onClick={() => handleChooseColor(hexColor)}
         />
