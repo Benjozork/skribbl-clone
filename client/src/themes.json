@@ -1,0 +1,62 @@
+[
+    {
+        "title": "Sun Down",
+        "accent": "#C4C4C4",
+        "standard": "#6C6C6C",
+        "body": "#242424"
+    },
+    {
+        "title": "Sun Up",
+        "accent": "#000000",
+        "standard": "#BFBFBF",
+        "body": "#F2F2F2"
+    },
+    {
+        "title": "Seafarer",
+        "accent": "#ECB826",
+        "standard": "#154D6E",
+        "body": "#27354F"
+    },
+    {
+        "title": "Horizon",
+        "accent": "#EE4540",
+        "standard": "#21252B",
+        "body": "#282C34"
+    },
+    {
+        "title": "Atomic",
+        "accent": "#528BFF",
+        "standard": "#21252B",
+        "body": "#282C34"
+    },
+    {
+        "title": "Radioactive",
+        "accent": "#B6E023",
+        "standard": "#272C33",
+        "body": "#161B23"
+    },
+    {
+        "title": "Antique",
+        "accent": "#89DDF8",
+        "standard": "#1B1F2F",
+        "body": "#10121B"
+    },
+    {
+        "title": "Arctic",
+        "accent": "#C4BBAC",
+        "standard": "#6A655F",
+        "body": "#6A655F"
+    },
+    {
+        "title": "Takeoff",
+        "accent": "#00C2CB",
+        "standard": "#1B2434",
+        "body": "#171E2B"
+    },
+    {
+        "title": "Duke",
+        "accent": "#FB4948",
+        "standard": "#10110F",
+        "body": "#FDFEF4"
+    }
+]
