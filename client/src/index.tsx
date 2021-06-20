@@ -6,7 +6,7 @@ import { GameBoard } from './GameBoard';
 import { ClientContextProvider } from './hooks';
 import { store, useGameSelector } from './redux/store';
 
-import './styles.css';
+import './styles/tailwind.css';
 
 import themes from './themes.json';
 
