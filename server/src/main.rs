@@ -87,7 +87,7 @@ async fn main() {
 async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, users: Users) {
     let my_id = NEXT_USER_ID.fetch_add(1, Ordering::Relaxed);
 
-    eprintln!("User {} initialized", my_id);
+    eprintln!("Connection {} initialized", my_id);
 
     let (user_ws_tx, mut user_ws_rx) = ws.split();
 
@@ -117,7 +117,12 @@ async fn client_connected(ws: WebSocket, connected_clients: ConnectedClients, us
     client_disconnected(my_id, &connected_clients, users).await;
 }
 
-async fn handle_calls(connected_clients: ConnectedClients, users: Users, msg: Message, my_id: usize) {
+async fn handle_calls(
+    connected_clients: ConnectedClients,
+    users: Users,
+    msg: Message,
+    my_id: usize,
+) {
     let msg = if let Ok(s) = msg.to_str() {
         s
     } else {
@@ -126,57 +131,59 @@ async fn handle_calls(connected_clients: ConnectedClients, users: Users, msg: Me
 
     let resp: Value = serde_json::from_str(msg).unwrap();
 
-    let connected_client_temp = connected_clients.read().await;
-    let me = connected_client_temp.get(&my_id).unwrap();
-
     match resp["_message"].as_str() {
         Some("C_LoginToGame") => {
-            let resp: Result<LoginToGame, serde_json::Error> =
-                serde_json::from_str(msg);
-            match resp {
-                Ok(resp) => match user_connect(connected_clients.clone(), users.clone(), my_id, resp).await {
-                    Ok(user) => {
-                        let resp = LoginSucceeded {
-                            _message: "S_ConfirmGameLogin".to_string(),
-                            user,
-                        };
-                        let resp_text = serde_json::to_string(&resp).unwrap();
-                        me.send(Ok(Message::text(&resp_text))).unwrap();
-                    }
-
-                    // Return a failed connect call
-                    Err(err) => {
-                        let resp = LoginRejected {
-                            _message: "S_DenyGameLogin".to_string(),
-                            reason: format!("{:?}", err),
-                        };
-                        let resp_text = serde_json::to_string(&resp).unwrap();
-                        me.send(Ok(Message::text(&resp_text))).unwrap();
-                    }
-                },
-
-                // Return a failed connect call
-                Err(err) => {
-                    let resp = LoginRejected {
-                        _message: "S_DenyGameLogin".to_string(),
-                        reason: format!("{:?}", err),
-                    };
-                    let resp_text = serde_json::to_string(&resp).unwrap();
-                    me.send(Ok(Message::text(&resp_text))).unwrap();
-                }
-            }
+            login_to_game(connected_clients.clone(), users.clone(), my_id.clone(), msg).await
         }
         _ => (),
     }
+}
 
-    eprintln!("call: {:?}", resp);
+async fn login_to_game(connected_clients: ConnectedClients, users: Users, my_id: usize, msg: &str) {
+    let connected_client_temp = connected_clients.read().await;
+    let me = connected_client_temp.get(&my_id).unwrap();
+
+    let resp: Result<LoginToGame, serde_json::Error> = serde_json::from_str(msg);
+    match resp {
+        Ok(resp) => match user_connect(connected_clients.clone(), users.clone(), my_id, resp).await
+        {
+            Ok(user) => {
+                let resp = LoginSucceeded {
+                    _message: "S_ConfirmGameLogin".to_string(),
+                    user,
+                };
+                let resp_text = serde_json::to_string(&resp).unwrap();
+                me.send(Ok(Message::text(&resp_text))).unwrap();
+            }
+
+            // Return a failed connect call
+            Err(err) => {
+                let resp = LoginRejected {
+                    _message: "S_DenyGameLogin".to_string(),
+                    reason: format!("{:?}", err),
+                };
+                let resp_text = serde_json::to_string(&resp).unwrap();
+                me.send(Ok(Message::text(&resp_text))).unwrap();
+            }
+        },
+
+        // Return a failed connect call
+        Err(err) => {
+            let resp = LoginRejected {
+                _message: "S_DenyGameLogin".to_string(),
+                reason: format!("{:?}", err),
+            };
+            let resp_text = serde_json::to_string(&resp).unwrap();
+            me.send(Ok(Message::text(&resp_text))).unwrap();
+        }
+    }
 }
 
 async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients, users: Users) {
-    eprintln!("User {} disconnected", my_id);
-
-    connected_clients.write().await.remove(&my_id);
+    eprintln!("User with id #{} disconnected", &my_id);
+    eprintln!("Connection {} disconnected", my_id);
     users.write().await.remove(&my_id);
+    connected_clients.write().await.remove(&my_id);
 
     for (&uid, tx) in connected_clients.read().await.iter() {
         if users.read().await.contains_key(&uid) {
@@ -191,7 +198,12 @@ async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients,
     }
 }
 
-async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: usize, resp: LoginToGame) -> Result<User, String> {
+async fn user_connect(
+    connected_clients: ConnectedClients,
+    users: Users,
+    my_id: usize,
+    resp: LoginToGame,
+) -> Result<User, String> {
     //TODO: Filter Inappropriate usernames
 
     let user = User {
@@ -235,9 +247,7 @@ async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: 
         }
     }
 
-    for (key, value) in users.read().await.iter() {
-        eprintln!("key: {}\nvalue: {:?}\n", key, value)
-    }
+    eprintln!("User '{}' with id #{} Initialized", user.username, user.id);
 
     Ok(user)
 }
