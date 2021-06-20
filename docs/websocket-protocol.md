@@ -62,6 +62,14 @@ Notifies of a removed player.
 
 * `id`: `number` - ID of the removed user
 
+### `C_BeginGame`
+
+Notifies that the host wishes to start the game.
+
+#### Requirements
+
+- The sending player must be the host.
+
 ### `S_BeginDraw_Notify`
 
 Notifies that a player is about to start drawing.
