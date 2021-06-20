@@ -231,6 +231,14 @@ async fn user_connect(
         censor_user_content: resp.censor_user_content,
     };
 
+    if user.username.len() > 16 {
+        return Err("Username too long.".to_string());
+    }
+
+    if user.username.len() < 2 {
+        return Err("Username too short.".to_string());
+    }
+
     for (_, j) in users.read().await.iter() {
         if j.username == user.username && j.id != user.id {
             return Err("User already exists".to_string());
