@@ -1,4 +1,6 @@
 import { Message, ServerMessages } from './messages';
+import { addPlayer, removePlayer } from '../redux/players.reducer';
+import { store } from '../redux/store';
 
 export class WebsocketClient {
     private websocket: WebSocket;
@@ -34,17 +36,17 @@ export class WebsocketClient {
     }
 
     receiveMessage(incoming: Message) {
-        const { _message } = incoming;
-
-        switch (_message) {
-        case ServerMessages.ConfirmGameLogin:
-        case ServerMessages.DenyGameLogin:
-        case ServerMessages.AddGamePlayer:
-        case ServerMessages.RemoveGamePlayer:
-            console.log(incoming);
-            break;
-        default:
-            console.error(`Invalid message type: ${_message}`);
+        if (incoming._message === ServerMessages.ConfirmGameLogin) {
+            console.log('Login confirmed');
+        } else if (incoming._message === ServerMessages.DenyGameLogin) {
+            console.log('Login failed');
+        } else if (incoming._message === ServerMessages.AddGamePlayer) {
+            console.log('Adding player');
+            store.dispatch(addPlayer([0, incoming.user]));
+        } else if (incoming._message === ServerMessages.RemoveGamePlayer) {
+            removePlayer(incoming.userId);
+        } else {
+            console.error(`Invalid message type: ${incoming._message}`);
         }
     }
 }
