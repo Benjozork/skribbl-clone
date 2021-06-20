@@ -178,14 +178,16 @@ async fn client_disconnected(my_id: usize, connected_clients: &ConnectedClients,
     connected_clients.write().await.remove(&my_id);
     users.write().await.remove(&my_id);
 
-    for (_, tx) in connected_clients.read().await.iter() {
-        let resp = RemoveGamePlayer {
-            _message: "S_RemoveGamePlayer".to_string(),
-            id: my_id,
-        };
-        let resp_text = serde_json::to_string(&resp).unwrap();
+    for (&uid, tx) in connected_clients.read().await.iter() {
+        if users.read().await.contains_key(&uid) {
+            let resp = RemoveGamePlayer {
+                _message: "S_RemoveGamePlayer".to_string(),
+                id: my_id,
+            };
+            let resp_text = serde_json::to_string(&resp).unwrap();
 
-        tx.send(Ok(Message::text(&resp_text))).unwrap();
+            tx.send(Ok(Message::text(&resp_text))).unwrap();
+        }
     }
 }
 
