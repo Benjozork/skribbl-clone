@@ -214,7 +214,7 @@ async fn user_connect(connected_clients: ConnectedClients, users: Users, my_id: 
     let censorer = censor::Standard + censor::Sex;
 
     for (&uid, tx) in connected_clients.read().await.iter() {
-        if user.id != uid {
+        if users.read().await.contains_key(&uid) && user.id != uid {
             let should_censor = users.read().await.get(&uid).unwrap().censor_user_content;
 
             let mut user = user.clone();
