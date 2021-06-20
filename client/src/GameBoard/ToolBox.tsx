@@ -1,8 +1,11 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */
-import React, { useState, FC } from 'react';
+import React, { useState, useRef, FC } from 'react';
 import { IconSpeakerphone, IconArrowBackUp, IconArrowForwardUp, IconEraser, IconBucket, IconTrash, IconThumbUp, IconThumbDown } from '@tabler/icons';
 import { DrawingCanvasControllerUsage } from './DrawingCanvas';
 import { themeColors } from '../index';
+import Squiggle from './Squiggle';
+
+import '../styles/slider.css';
 
 export type ToolBoxProps = {
     onUseController: (usage: DrawingCanvasControllerUsage) => void,
@@ -26,7 +29,7 @@ const Button: FC<buttonProps> = ({ onClick, className, children }) => (
 );
 
 const Divider = () => (
-    <div className="w-full h-1 rounded-lg" style={{ background: themeColors.ACCENT }} />
+    <div className="w-full h-1 rounded-lg" style={{ background: themeColors.STANDARD }} />
 );
 
 const ColorPanel: FC = ({ children }) => (
@@ -37,7 +40,9 @@ const ColorPanel: FC = ({ children }) => (
 
 export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     // const [selectedTool] = useState(0);
-    const [selectedColor, setSelectedColor] = useState('#FFFFFF');
+    const [selectedColor, setSelectedColor] = useState('#000000');
+    const [drawingThickness, setDrawingThickness] = useState(5);
+    const sliderRef = useRef<HTMLInputElement>();
 
     const handleClear = () => {
         onUseController((canvas, context) => {
@@ -54,11 +59,16 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
 
     const ColorSelection = ({ hexColor }: colorSelectionProps) => (
         <div
-            className={`${hexColor === selectedColor ? 'border-current/40' : 'border-transparent'} border-2 w-6 h-6 rounded-full cursor-pointer`}
+            className={`${hexColor === selectedColor ? 'border-current/40' : 'border-transparent'} border-2 w-5 h-5 rounded-full cursor-pointer`}
             style={{ background: hexColor, color: themeColors.ACCENT }}
             onClick={() => handleChooseColor(hexColor)}
         />
     );
+
+    const handleThicknessChange = () => {
+        console.log(sliderRef.current.value);
+        setDrawingThickness(parseInt(sliderRef.current.value));
+    };
 
     return (
         <div className="text-2xl w-32 mx-10 flex flex-col justify-center space-y-3">
@@ -77,7 +87,10 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     <IconArrowForwardUp size={32} />
                 </Button>
             </div>
-            <Divider />
+            <div className="space-y-1.5">
+                <Divider />
+                <Divider />
+            </div>
             <ColorPanel>
                 <ColorSelection hexColor="#FFFFFF" />
                 <ColorSelection hexColor="#FF0000" />
@@ -88,6 +101,33 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                 <ColorSelection hexColor="#22FF00" />
                 <ColorSelection hexColor="#00FFFF" />
             </ColorPanel>
+            <div className="px-2 py-1 rounded-sm" style={{ background: themeColors.STANDARD }}>
+                <div className="w-full flex justify-between py-1">
+                    <div onClick={() => {
+                        sliderRef.current.value = sliderRef.current.min;
+                    }}
+                    >
+                        <Squiggle className="cursor-pointer overflow-visible" width="16" height="16" strokeWidth="1" strokeColor={themeColors.ACCENT} />
+                    </div>
+                    <div
+                        onClick={() => {
+                            sliderRef.current.value = sliderRef.current.max;
+                        }}
+                    >
+                        <Squiggle className="cursor-pointer overflow-visible" width="16" height="16" strokeWidth="3" strokeColor={themeColors.ACCENT} />
+                    </div>
+                </div>
+                <input
+                    type="range"
+                    className="slider"
+                    ref={sliderRef}
+                    min="1"
+                    max="10"
+                    defaultValue={drawingThickness}
+                    onChange={() => handleThicknessChange()}
+                    style={{ background: themeColors.ACCENT, color: themeColors.BODY }}
+                />
+            </div>
             <Divider />
             <div className="grid grid-cols-2 gap-3">
                 <Button onClick={() => console.log()}>
