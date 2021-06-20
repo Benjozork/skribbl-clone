@@ -133,8 +133,9 @@ async fn handle_calls(
 
     match resp["_message"].as_str() {
         Some("C_LoginToGame") => {
-            login_to_game(connected_clients.clone(), users.clone(), my_id.clone(), msg).await
+            login_to_game(connected_clients.clone(), users.clone(), my_id, msg).await
         }
+        Some("C_BeginGame") => begin_game(users.clone(), my_id).await,
         _ => (),
     }
 }
@@ -175,6 +176,23 @@ async fn login_to_game(connected_clients: ConnectedClients, users: Users, my_id:
             };
             let resp_text = serde_json::to_string(&resp).unwrap();
             me.send(Ok(Message::text(&resp_text))).unwrap();
+        }
+    }
+}
+
+async fn begin_game(users: Users, my_id: usize) {
+    if users.read().await.contains_key(&my_id) {
+        let mut uuids: Vec<usize> = Vec::new();
+
+        for (_, value) in users.read().await.iter() {
+            uuids.push(value.id);
+        }
+
+        let host_uid = uuids.iter().min().unwrap_or(&0_usize);
+
+        if &my_id == host_uid {
+            //TODO: Add start game code
+            eprintln!("Game Started");
         }
     }
 }
@@ -243,7 +261,7 @@ async fn user_connect(
             };
             let resp_text = serde_json::to_string(&resp).unwrap();
 
-            if let Err(_) = tx.send(Ok(Message::text(&resp_text))) {}
+            tx.send(Ok(Message::text(&resp_text))).unwrap();
         }
     }
 
