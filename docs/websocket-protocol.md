@@ -24,7 +24,7 @@ Attempts to log in to a game.
 
 #### Fields
 
-* `username`: `string`
+* `username`: `string` - Must be between 2 and 16 characters, inclusively.
 * `color`: `HexColor`
 * `censorUserContent`: `boolean` - Whether the server should censor user content sent to the client
 
