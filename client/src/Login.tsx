@@ -1,11 +1,8 @@
 import React, { FC, useContext, useRef } from 'react';
 import { ClientContext } from './hooks';
 import { ClientMessages } from './ws/messages';
-import { useGameSelector } from './redux/store';
 
 export const Login: FC = () => {
-    const players = useGameSelector((state) => state.players.players);
-
     const usernameInputRef = useRef<HTMLInputElement>();
     const colorInputRef = useRef<HTMLInputElement>();
 
@@ -39,16 +36,6 @@ export const Login: FC = () => {
             </div>
 
             <button type="button" onClick={handleLogin}>Login</button>
-
-            <h1 className="text-2xl">Players</h1>
-
-            {Object.entries(players).map(([id, data]) => (
-                <div>
-                    {id}
-                    :
-                    {JSON.stringify(data)}
-                </div>
-            ))}
         </div>
     );
 };

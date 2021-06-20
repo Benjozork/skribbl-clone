@@ -1,6 +1,7 @@
 import { Message, ServerMessages } from './messages';
 import { addPlayer, removePlayer } from '../redux/players.reducer';
 import { store } from '../redux/store';
+import { login } from '../redux/connection.reducer';
 
 export class WebsocketClient {
     private websocket: WebSocket;
@@ -38,6 +39,7 @@ export class WebsocketClient {
     receiveMessage(incoming: Message) {
         if (incoming._message === ServerMessages.ConfirmGameLogin) {
             console.log('Login confirmed');
+            store.dispatch(login());
         } else if (incoming._message === ServerMessages.DenyGameLogin) {
             console.log('Login failed');
         } else if (incoming._message === ServerMessages.AddGamePlayer) {
