@@ -11,11 +11,11 @@ export const GameBoard: FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center">
-            <DrawingCanvas width={1920} height={1080} onUpdatedDrawingCanvasController={setDrawingController} />
-
-            <ToolBox onUseController={handleUseDrawingController} />
-
+        <div className="flex flex-col items-center h-screen w-full">
+            <div className="flex flex-row">
+                <ToolBox onUseController={handleUseDrawingController} />
+                <DrawingCanvas width={1280} height={720} className="bg-white shadow-lg" onUpdatedDrawingCanvasController={setDrawingController} />
+            </div>
             <PlayerBar />
         </div>
     );

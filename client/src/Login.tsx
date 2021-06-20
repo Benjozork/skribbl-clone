@@ -35,21 +35,21 @@ export const Login: FC = () => {
     };
 
     return (
-        <div className="flex flex-col justify-center font-mono h-screen w-screen items-center" style={{ background: themeColors.BODY }}>
-            <h1 className="text-6xl font-bold" style={{ color: themeColors.ACCENT }}>Login</h1>
-            <div className="py-4">
-                <div className="py-1">
+        <div className="max-w-xl w-96 flex flex-col justify-center mx-auto font-mono h-screen items-center">
+            <h1 className="text-3xl font-bold place-self-start" style={{ color: themeColors.ACCENT }}>Login</h1>
+            <div className="w-full py-4">
+                <div className="w-full py-1">
                     <input
-                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-96 placeholder-opacity-60"
+                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-full placeholder-opacity-60"
                         placeholder="Name"
                         ref={usernameInputRef}
                         type="text"
                         style={{ background: themeColors.STANDARD, color: themeColors.ACCENT }}
                     />
                 </div>
-                <div className="py-1">
+                <div className="w-full py-1">
                     <input
-                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-96 placeholder-opacity-60"
+                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-full placeholder-opacity-60"
                         placeholder="Color"
                         ref={colorInputRef}
                         type="text"
@@ -61,7 +61,7 @@ export const Login: FC = () => {
             </div>
 
             <button
-                className="rounded-md text-lg shadow-xl focus:outline-none py-2 px-4 hover:bg-opacity-80 transition duration-200"
+                className="rounded-md text-lg self-end shadow-xl focus:outline-none py-2 px-6 hover:bg-opacity-80 transition duration-200"
                 type="button"
                 onClick={handleLogin}
                 style={{ background: themeColors.STANDARD, color: themeColors.ACCENT }}
