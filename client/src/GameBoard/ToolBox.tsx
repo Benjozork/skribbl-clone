@@ -96,7 +96,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
             </ColorPanel>
             <Divider />
             <div className="grid grid-cols-2 gap-3">
-                <Button onClick={() => console.log()}>
+                <Button onClick={() => handleChooseColor('#FFFFFF')}>
                     <IconEraser size={32} />
                 </Button>
                 <Button onClick={() => console.log()}>
