@@ -14,6 +14,10 @@ if (localStorage.getItem('theme') === null) {
     localStorage.setItem('theme', JSON.stringify(themes[8]));
 }
 
+if (localStorage.getItem('isSoundMuted') === null) {
+    localStorage.setItem('isSoundMuted', 'false');
+}
+
 type themeColorProps = {
     BODY: string,
     STANDARD: string,
