@@ -27,11 +27,13 @@ export const themeColors: themeColorProps = {
 };
 
 const App: FC = () => (
-    <Provider store={store}>
-        <ClientContextProvider>
-            <AppContents />
-        </ClientContextProvider>
-    </Provider>
+    <div style={{ background: themeColors.BODY }}>
+        <Provider store={store}>
+            <ClientContextProvider>
+                <AppContents />
+            </ClientContextProvider>
+        </Provider>
+    </div>
 );
 
 const AppContents: FC = () => {
