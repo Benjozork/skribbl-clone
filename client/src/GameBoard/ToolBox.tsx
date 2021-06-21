@@ -41,7 +41,7 @@ const ColorPanel: FC = ({ children }) => (
 export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     // const [selectedTool] = useState(0);
     const [selectedColor, setSelectedColor] = useState('#000000');
-    const [drawingThickness, setDrawingThickness] = useState(5);
+    const [drawingThickness, setDrawingThickness] = useState(JSON.parse(localStorage.getItem('drawingThickness')));
     const sliderRef = useRef<HTMLInputElement>();
 
     const handleClear = () => {
@@ -67,6 +67,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
 
     const handleThicknessChange = () => {
         setDrawingThickness(parseInt(sliderRef.current.value));
+        localStorage.setItem('drawingThickness', sliderRef.current.value);
     };
 
     return (
@@ -100,8 +101,8 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                 <ColorSelection hexColor="#22FF00" />
                 <ColorSelection hexColor="#00FFFF" />
             </ColorPanel>
-            <div className="px-2 py-1 rounded-sm" style={{ background: themeColors.STANDARD }}>
-                <div className="w-full flex justify-between py-1">
+            <div className="px-2 py-1.5 rounded-sm" style={{ background: themeColors.STANDARD }}>
+                <div className="w-full flex -mb-1 justify-between">
                     <div onClick={() => {
                         sliderRef.current.value = sliderRef.current.min;
                     }}
@@ -122,7 +123,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     ref={sliderRef}
                     min="1"
                     max="10"
-                    defaultValue={drawingThickness}
+                    value={drawingThickness}
                     onChange={() => handleThicknessChange()}
                     style={{ background: themeColors.ACCENT, color: themeColors.BODY }}
                 />
