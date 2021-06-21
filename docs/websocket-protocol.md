@@ -83,6 +83,8 @@ Notifies of a removed player.
 
 Notifies that the host wishes to start the game.
 
+The server must send a subsequent `S_BeginDraw_Notify` to all clients.
+
 #### Requirements
 
 - The sending player must be the host.
@@ -90,6 +92,10 @@ Notifies that the host wishes to start the game.
 ### `S_BeginDraw_Notify`
 
 Notifies that a player is about to start drawing.
+
+#### Fields
+
+* `id`: `number` - ID of the drawing user
 
 ### `S_BeginDraw_NotifyStart`
 
