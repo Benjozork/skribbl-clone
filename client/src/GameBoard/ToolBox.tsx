@@ -66,7 +66,6 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     );
 
     const handleThicknessChange = () => {
-        console.log(sliderRef.current.value);
         setDrawingThickness(parseInt(sliderRef.current.value));
     };
 
