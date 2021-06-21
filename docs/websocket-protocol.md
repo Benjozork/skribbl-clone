@@ -16,6 +16,23 @@ Version 1.0
 * `color`: `HexColor`
 * `id`: `int`
 
+### `DrawCommand`
+
+`any[]`
+
+* element `0`: `DrawCommandType`
+* elements `1-X`: `any` - arguments to draw command - see below
+
+#### Draw command arguments
+
+For `DrawCommandType === 0`: `[number, number, string]` - in order: x position, y position, color 
+
+### DrawCommandType
+
+`Enum<number>`
+
+* `0`: Pen stroke
+
 ## Commands
 
 ### `C_LoginToGame`
@@ -90,6 +107,10 @@ Clears the local canvas.
 
 Updates the local canvas with a set of commands.
 
+### Fields
+
+* `commands`: `DrawCommand[]`
+
 ### `S_GuessChat_Update`
 
 Notifies of a new entry in the guess chat.
@@ -127,6 +148,10 @@ Clears the distant canvases.
 ### `C_Canvas_Commands`
 
 Updates the distant canvases with a set of commands.
+
+### Fields
+
+* `commands`: `DrawCommand[]`
 
 ### `C_Guess_Submit`
 
