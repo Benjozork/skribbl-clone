@@ -75,7 +75,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
             <Button onClick={() => console.log()}>
                 <IconSpeakerphone size={32} />
             </Button>
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Divider />
                 <Divider />
             </div>
@@ -87,7 +87,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     <IconArrowForwardUp size={32} />
                 </Button>
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Divider />
                 <Divider />
             </div>
@@ -142,7 +142,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     <IconTrash size={32} />
                 </Button>
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-1">
                 <Divider />
                 <Divider />
             </div>
