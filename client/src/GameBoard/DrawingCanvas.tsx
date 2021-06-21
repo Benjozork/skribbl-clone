@@ -69,8 +69,9 @@ export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className
 
                             context.fillStyle = 'red';
                         }
-
-                        context.fillRect((lastDraw.x - HALF_BLOCK_SIZE) + sx, (lastDraw.y - HALF_BLOCK_SIZE) + sy, BLOCK_SIZE, BLOCK_SIZE);
+                        context.beginPath();
+                        context.arc((lastDraw.x - HALF_BLOCK_SIZE) + sx, (lastDraw.y - HALF_BLOCK_SIZE) + sy, BLOCK_SIZE, 0, 2 * Math.PI);
+                        context.fill();
 
                         if (STEP_DEBUG) {
                             context.fillStyle = 'black';
@@ -80,8 +81,9 @@ export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className
             }
 
             setLastDraw({ x, y });
-
-            context.fillRect(x - HALF_BLOCK_SIZE, y - HALF_BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            context.beginPath();
+            context.arc(x - HALF_BLOCK_SIZE, y - HALF_BLOCK_SIZE, BLOCK_SIZE, 0, 2 * Math.PI);
+            context.fill();
         }
     };
 
