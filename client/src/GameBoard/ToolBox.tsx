@@ -33,7 +33,7 @@ const Divider = () => (
 );
 
 const ColorPanel: FC = ({ children }) => (
-    <div className="grid grid-cols-4 w-full py-2 justify-items-center gap-y-1" style={{ background: themeColors.STANDARD }}>
+    <div className="grid grid-cols-4 rounded-sm w-full py-2 justify-items-center gap-y-1" style={{ background: themeColors.STANDARD }}>
         {children}
     </div>
 );
