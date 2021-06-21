@@ -105,6 +105,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                 <div className="w-full flex -mb-1 justify-between">
                     <div onClick={() => {
                         sliderRef.current.value = sliderRef.current.min;
+                        handleThicknessChange();
                     }}
                     >
                         <Squiggle className="cursor-pointer overflow-visible" width="16" height="16" strokeWidth="1" strokeColor={themeColors.ACCENT} />
@@ -112,6 +113,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     <div
                         onClick={() => {
                             sliderRef.current.value = sliderRef.current.max;
+                            handleThicknessChange();
                         }}
                     >
                         <Squiggle className="cursor-pointer overflow-visible" width="16" height="16" strokeWidth="3" strokeColor={themeColors.ACCENT} />
