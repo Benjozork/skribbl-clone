@@ -121,7 +121,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                 </div>
                 <input
                     type="range"
-                    className="slider"
+                    className="slider cursor-pointer"
                     ref={sliderRef}
                     min="1"
                     max="30"
