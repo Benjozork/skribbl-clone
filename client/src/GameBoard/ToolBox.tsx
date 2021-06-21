@@ -71,7 +71,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     };
 
     return (
-        <div className="text-2xl w-32 mx-10 flex flex-col justify-center space-y-3">
+        <div className="text-2xl w-32 mx-10 flex flex-col justify-center space-y-2">
             <Button onClick={() => console.log()}>
                 <IconSpeakerphone size={32} />
             </Button>
