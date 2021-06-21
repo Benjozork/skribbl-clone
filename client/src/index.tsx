@@ -15,7 +15,7 @@ if (localStorage.getItem('theme') === null) {
 }
 
 if (localStorage.getItem('drawingThickness') === null) {
-    localStorage.setItem('drawingThickness', '5');
+    localStorage.setItem('drawingThickness', '15');
 }
 
 type themeColorProps = {

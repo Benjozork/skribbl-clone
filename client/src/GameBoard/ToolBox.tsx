@@ -124,7 +124,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     className="slider"
                     ref={sliderRef}
                     min="1"
-                    max="10"
+                    max="30"
                     value={drawingThickness}
                     onChange={() => handleThicknessChange()}
                     style={{ background: themeColors.ACCENT, color: themeColors.BODY }}
