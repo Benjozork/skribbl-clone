@@ -1,9 +1,5 @@
 import React, { CSSProperties, FC, MouseEvent, useEffect, useRef, useState } from 'react';
 
-const BLOCK_SIZE = 7;
-const HALF_BLOCK_SIZE = BLOCK_SIZE / 2;
-const STEP_DEBUG = false;
-
 export type DrawingCanvasProps = {
     width: number,
     height: number,
@@ -12,7 +8,12 @@ export type DrawingCanvasProps = {
     onUpdatedDrawingCanvasController: (controller: DrawingCanvasController) => void,
 }
 
+const STEP_DEBUG = false;
+
 export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className, style, onUpdatedDrawingCanvasController }) => {
+    const BLOCK_SIZE = parseInt(localStorage.getItem('drawingThickness'));
+    const HALF_BLOCK_SIZE = BLOCK_SIZE / 2;
+
     const canvasRef = useRef<HTMLCanvasElement>();
 
     const [context, setContext] = useState<CanvasRenderingContext2D>();
@@ -118,7 +119,7 @@ export class DrawingCanvasController {
     constructor(
         private canvas: HTMLCanvasElement,
         private context: CanvasRenderingContext2D,
-    ) {}
+    ) { }
 
     use(func: DrawingCanvasControllerUsage) {
         func(this.canvas, this.context);
