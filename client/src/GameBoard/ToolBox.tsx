@@ -3,7 +3,7 @@ import React, { useState, useRef, FC } from 'react';
 import { IconSpeakerphone, IconArrowBackUp, IconArrowForwardUp, IconEraser, IconBucket, IconTrash, IconThumbUp, IconThumbDown } from '@tabler/icons';
 import { DrawingCanvasControllerUsage } from './DrawingCanvas';
 import { themeColors } from '../index';
-import Squiggle from './Squiggle';
+import { Squiggle } from './Squiggle';
 
 import '../styles/slider.css';
 
