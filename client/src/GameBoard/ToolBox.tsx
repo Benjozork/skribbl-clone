@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */
-import React, { useState, useRef, FC } from 'react';
+import React, { useState, useRef, FC, useEffect } from 'react';
 import { IconSpeakerphone, IconArrowBackUp, IconArrowForwardUp, IconEraser, IconBucket, IconTrash, IconThumbUp, IconThumbDown } from '@tabler/icons';
 import { DrawingCanvasControllerUsage } from './DrawingCanvas';
 import { themeColors } from '../index';
@@ -44,6 +44,10 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     const [drawingThickness, setDrawingThickness] = useState(JSON.parse(localStorage.getItem('drawingThickness')));
     const sliderRef = useRef<HTMLInputElement>();
 
+    useEffect(() => {
+        localStorage.setItem('drawingThickness', sliderRef.current.value);
+    }, [drawingThickness]);
+
     const handleClear = () => {
         onUseController((canvas, context) => {
             context.clearRect(0, 0, canvas.getBoundingClientRect().width, canvas.getBoundingClientRect().height);
@@ -64,11 +68,6 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
             onClick={() => handleChooseColor(hexColor)}
         />
     );
-
-    const handleThicknessChange = () => {
-        setDrawingThickness(parseInt(sliderRef.current.value));
-        localStorage.setItem('drawingThickness', sliderRef.current.value);
-    };
 
     return (
         <div className="text-2xl w-32 mx-10 flex flex-col justify-center space-y-2">
@@ -105,7 +104,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                 <div className="w-full flex -mb-1 justify-between">
                     <div onClick={() => {
                         sliderRef.current.value = sliderRef.current.min;
-                        handleThicknessChange();
+                        setDrawingThickness(parseInt(sliderRef.current.value));
                     }}
                     >
                         <Squiggle className="cursor-pointer overflow-visible" width="16" height="16" strokeWidth="1" strokeColor={themeColors.ACCENT} />
@@ -113,7 +112,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     <div
                         onClick={() => {
                             sliderRef.current.value = sliderRef.current.max;
-                            handleThicknessChange();
+                            setDrawingThickness(parseInt(sliderRef.current.value));
                         }}
                     >
                         <Squiggle className="cursor-pointer overflow-visible" width="16" height="16" strokeWidth="3" strokeColor={themeColors.ACCENT} />
@@ -126,7 +125,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
                     min="1"
                     max="30"
                     value={drawingThickness}
-                    onChange={() => handleThicknessChange()}
+                    onChange={() => setDrawingThickness(parseInt(sliderRef.current.value))}
                     style={{ background: themeColors.ACCENT, color: themeColors.BODY }}
                 />
             </div>
