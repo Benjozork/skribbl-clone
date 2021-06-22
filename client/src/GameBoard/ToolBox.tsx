@@ -42,7 +42,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     const [isSoundMuted, setIsSoundMuted] = useState<Boolean>(JSON.parse(localStorage.getItem('isSoundMuted')));
 
     useEffect(() => {
-        localStorage.setItem('isSoundMuted', String(!isSoundMuted));
+        localStorage.setItem('isSoundMuted', String(isSoundMuted));
     }, [isSoundMuted]);
 
     const [selectedColor, setSelectedColor] = useState('#000000');
