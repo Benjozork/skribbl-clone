@@ -6,6 +6,7 @@ module.exports = {
     plugins: [
         '@snowpack/plugin-postcss',
         '@snowpack/plugin-sass',
+        '@snowpack/plugin-react-refresh',
     ],
     packageOptions: {},
     devOptions: { tailwindConfig: './tailwind.config.js' },

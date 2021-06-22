@@ -6,12 +6,16 @@ import { GameBoard } from './GameBoard';
 import { ClientContextProvider } from './hooks';
 import { store, useGameSelector } from './redux/store';
 
-import './styles.css';
+import './styles/tailwind.css';
 
 import themes from './themes.json';
 
 if (localStorage.getItem('theme') === null) {
     localStorage.setItem('theme', JSON.stringify(themes[8]));
+}
+
+if (localStorage.getItem('drawingThickness') === null) {
+    localStorage.setItem('drawingThickness', '15');
 }
 
 type themeColorProps = {
