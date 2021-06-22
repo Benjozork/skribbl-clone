@@ -6,7 +6,7 @@ import { GameBoard } from './GameBoard';
 import { ClientContextProvider } from './hooks';
 import { store, useGameSelector } from './redux/store';
 
-import './styles.css';
+import './styles/tailwind.css';
 
 import themes from './themes.json';
 
@@ -16,6 +16,9 @@ if (localStorage.getItem('theme') === null) {
 
 if (localStorage.getItem('isSoundMuted') === null) {
     localStorage.setItem('isSoundMuted', 'false');
+
+if (localStorage.getItem('drawingThickness') === null) {
+    localStorage.setItem('drawingThickness', '15');
 }
 
 type themeColorProps = {

@@ -1,9 +1,5 @@
 import React, { CSSProperties, FC, MouseEvent, useEffect, useRef, useState } from 'react';
 
-const BLOCK_SIZE = 7;
-const HALF_BLOCK_SIZE = BLOCK_SIZE / 2;
-const STEP_DEBUG = false;
-
 export type DrawingCanvasProps = {
     width: number,
     height: number,
@@ -12,7 +8,12 @@ export type DrawingCanvasProps = {
     onUpdatedDrawingCanvasController: (controller: DrawingCanvasController) => void,
 }
 
+const STEP_DEBUG = false;
+
 export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className, style, onUpdatedDrawingCanvasController }) => {
+    const BLOCK_SIZE = parseInt(localStorage.getItem('drawingThickness'));
+    const HALF_BLOCK_SIZE = BLOCK_SIZE / 2;
+
     const canvasRef = useRef<HTMLCanvasElement>();
 
     const [context, setContext] = useState<CanvasRenderingContext2D>();
@@ -68,8 +69,9 @@ export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className
 
                             context.fillStyle = 'red';
                         }
-
-                        context.fillRect((lastDraw.x - HALF_BLOCK_SIZE) + sx, (lastDraw.y - HALF_BLOCK_SIZE) + sy, BLOCK_SIZE, BLOCK_SIZE);
+                        context.beginPath();
+                        context.arc((lastDraw.x - HALF_BLOCK_SIZE) + sx, (lastDraw.y - HALF_BLOCK_SIZE) + sy, BLOCK_SIZE, 0, 2 * Math.PI);
+                        context.fill();
 
                         if (STEP_DEBUG) {
                             context.fillStyle = 'black';
@@ -79,8 +81,9 @@ export const DrawingCanvas: FC<DrawingCanvasProps> = ({ width, height, className
             }
 
             setLastDraw({ x, y });
-
-            context.fillRect(x - HALF_BLOCK_SIZE, y - HALF_BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+            context.beginPath();
+            context.arc(x - HALF_BLOCK_SIZE, y - HALF_BLOCK_SIZE, BLOCK_SIZE, 0, 2 * Math.PI);
+            context.fill();
         }
     };
 
@@ -118,7 +121,7 @@ export class DrawingCanvasController {
     constructor(
         private canvas: HTMLCanvasElement,
         private context: CanvasRenderingContext2D,
-    ) {}
+    ) { }
 
     use(func: DrawingCanvasControllerUsage) {
         func(this.canvas, this.context);
