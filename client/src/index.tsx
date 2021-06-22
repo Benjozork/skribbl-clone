@@ -16,6 +16,7 @@ if (localStorage.getItem('theme') === null) {
 
 if (localStorage.getItem('isSoundMuted') === null) {
     localStorage.setItem('isSoundMuted', 'false');
+}
 
 if (localStorage.getItem('drawingThickness') === null) {
     localStorage.setItem('drawingThickness', '15');

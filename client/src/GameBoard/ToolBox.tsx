@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */
 import React, { useState, useRef, FC, useEffect } from 'react';
+import { IconVolume3, IconVolume, IconArrowBackUp, IconArrowForwardUp, IconEraser, IconBucket, IconTrash, IconThumbUp, IconThumbDown } from '@tabler/icons';
 import { DrawingCanvasControllerUsage } from './DrawingCanvas';
 import { themeColors } from '../index';
 import { Squiggle } from './Squiggle';
-
 import '../styles/slider.css';
 
 export type ToolBoxProps = {
