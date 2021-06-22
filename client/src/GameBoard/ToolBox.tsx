@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */
-import React, { useState, FC } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { IconVolume, IconVolume3, IconArrowBackUp, IconArrowForwardUp, IconEraser, IconBucket, IconTrash, IconThumbUp, IconThumbDown } from '@tabler/icons';
 import { DrawingCanvasControllerUsage } from './DrawingCanvas';
 import { themeColors } from '../index';
@@ -38,7 +38,11 @@ const ColorPanel: FC = ({ children }) => (
 export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     // const [selectedTool] = useState(0);
     const [selectedColor, setSelectedColor] = useState('#FFFFFF');
-    const [isSoundMuted, setIsSoundMuted] = useState(JSON.parse(localStorage.getItem('isSoundMuted')));
+    const [isSoundMuted, setIsSoundMuted] = useState<Boolean>(JSON.parse(localStorage.getItem('isSoundMuted')));
+
+    useEffect(() => {
+        localStorage.setItem('isSoundMuted', String(!isSoundMuted));
+    }, [isSoundMuted]);
 
     const handleClear = () => {
         onUseController((canvas, context) => {
@@ -61,15 +65,10 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
         />
     );
 
-    const handleSoundMuteChange = () => {
-        setIsSoundMuted(!isSoundMuted);
-        localStorage.setItem('isSoundMuted', String(!isSoundMuted));
-    };
-    console.log(JSON.parse(localStorage.getItem('isSoundMuted')));
     return (
         <div className="text-2xl w-32 mx-10 flex flex-col justify-center space-y-3">
-            <Button onClick={() => handleSoundMuteChange()}>
-                { isSoundMuted ? <IconVolume3 size={32} /> : <IconVolume size={32} /> }
+            <Button onClick={() => setIsSoundMuted(!isSoundMuted)}>
+                {isSoundMuted ? <IconVolume3 size={32} /> : <IconVolume size={32} />}
             </Button>
             <div className="space-y-1.5">
                 <Divider />
