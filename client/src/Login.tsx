@@ -35,12 +35,12 @@ export const Login: FC = () => {
     };
 
     return (
-        <div className="max-w-xl w-96 flex flex-col justify-center mx-auto font-mono h-screen items-center">
+        <div className="max-w-xl px-10 flex flex-col justify-center mx-auto font-mono h-screen items-center">
             <h1 className="text-3xl font-bold place-self-start" style={{ color: themeColors.ACCENT }}>Login</h1>
             <div className="w-full py-4">
                 <div className="w-full py-1">
                     <input
-                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-full placeholder-opacity-60"
+                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 pr-2 w-full placeholder-opacity-60"
                         placeholder="Name"
                         ref={usernameInputRef}
                         type="text"
@@ -49,7 +49,7 @@ export const Login: FC = () => {
                 </div>
                 <div className="w-full py-1">
                     <input
-                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 w-full placeholder-opacity-60"
+                        className="focus:outline-none shadow-xl text-xl py-2 pl-4 pr-2 w-full placeholder-opacity-60"
                         placeholder="Color"
                         ref={colorInputRef}
                         type="text"

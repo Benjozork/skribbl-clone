@@ -1,10 +1,9 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */
 import React, { useState, useRef, FC, useEffect } from 'react';
-import { IconSpeakerphone, IconArrowBackUp, IconArrowForwardUp, IconEraser, IconBucket, IconTrash, IconThumbUp, IconThumbDown } from '@tabler/icons';
+import { IconVolume3, IconVolume, IconArrowBackUp, IconArrowForwardUp, IconEraser, IconBucket, IconTrash, IconThumbUp, IconThumbDown } from '@tabler/icons';
 import { DrawingCanvasControllerUsage } from './DrawingCanvas';
 import { themeColors } from '../index';
 import { Squiggle } from './Squiggle';
-
 import '../styles/slider.css';
 
 export type ToolBoxProps = {
@@ -40,6 +39,12 @@ const ColorPanel: FC = ({ children }) => (
 
 export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
     // const [selectedTool] = useState(0);
+    const [isSoundMuted, setIsSoundMuted] = useState<Boolean>(JSON.parse(localStorage.getItem('isSoundMuted')));
+
+    useEffect(() => {
+        localStorage.setItem('isSoundMuted', String(isSoundMuted));
+    }, [isSoundMuted]);
+
     const [selectedColor, setSelectedColor] = useState('#000000');
     const [drawingThickness, setDrawingThickness] = useState(JSON.parse(localStorage.getItem('drawingThickness')));
     const sliderRef = useRef<HTMLInputElement>();
@@ -63,16 +68,16 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
 
     const ColorSelection = ({ hexColor }: colorSelectionProps) => (
         <div
-            className={`${hexColor === selectedColor ? 'border-current/40' : 'border-transparent'} border-2 w-5 h-5 rounded-full cursor-pointer`}
+            className={`${hexColor === selectedColor ? 'border-current border-opacity-40' : 'border-transparent'} border-2 w-6 h-6 rounded-full cursor-pointer`}
             style={{ background: hexColor, color: themeColors.ACCENT }}
             onClick={() => handleChooseColor(hexColor)}
         />
     );
 
     return (
-        <div className="text-2xl w-32 mx-10 flex flex-col justify-center space-y-2">
-            <Button onClick={() => console.log()}>
-                <IconSpeakerphone size={32} />
+        <div className="text-2xl w-32 mx-10 flex flex-col justify-center space-y-3">
+            <Button onClick={() => setIsSoundMuted(!isSoundMuted)}>
+                {isSoundMuted ? <IconVolume3 size={32} /> : <IconVolume size={32} />}
             </Button>
             <div className="space-y-1">
                 <Divider />
@@ -131,7 +136,7 @@ export const ToolBox: FC<ToolBoxProps> = ({ onUseController }) => {
             </div>
             <Divider />
             <div className="grid grid-cols-2 gap-3">
-                <Button onClick={() => console.log()}>
+                <Button onClick={() => handleChooseColor('white')}>
                     <IconEraser size={32} />
                 </Button>
                 <Button onClick={() => console.log()}>
